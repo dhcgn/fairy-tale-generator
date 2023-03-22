@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 	"os"
@@ -86,8 +86,12 @@ var (
 )
 
 func main() {
+	fmt.Println("Fairy Tale Generator")
+	fmt.Println("https://github.com/dhcgn/fairy-tale-generator")
+	fmt.Println()
+
 	if apiKey == "" || awsAccessKey == "" || awsSecretKey == "" {
-		fmt.Println("Please set the environment variables OPENAI_API_KEY, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
+		pterm.Error.Println("Please set the environment variables OPENAI_API_KEY, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
 		return
 	}
 
@@ -96,7 +100,7 @@ func main() {
 	pterm.Info.Println("Generating fairy tale...")
 
 	ts := createTimestamp()
-	generate(selectedMainCharaters, selectedSupporterCharaters, location, storyPlot, ts)
+	generateAndPlay(selectedMainCharaters, selectedSupporterCharaters, location, storyPlot, ts)
 
 }
 
@@ -109,7 +113,7 @@ func getFairyTaleOptions() (selectedMainCharaters, selectedSupporterCharaters []
 	selectedMainCharaters, _ = pterm.DefaultInteractiveMultiselect.WithOptions(CharacterMainSet).WithDefaultOptions(CharacterMainSet).WithDefaultText("Select the main characters").Show()
 
 	if len(selectedMainCharaters) == 0 {
-		pterm.Error.Println("No main characters selected, a random character will be selected.")
+		pterm.Warning.Println("No main characters selected, a random character will be selected.")
 		selectedMainCharaters = append(selectedMainCharaters, CharacterMainSet[rand.Intn(len(CharacterMainSet))])
 	}
 
@@ -118,7 +122,7 @@ func getFairyTaleOptions() (selectedMainCharaters, selectedSupporterCharaters []
 	selectedSupporterCharaters, _ = pterm.DefaultInteractiveMultiselect.WithOptions(CharacterSupporterSet).WithDefaultText("Select the main support characters").Show()
 
 	if len(selectedSupporterCharaters) == 0 {
-		pterm.Error.Println("No support characters selected, a random character will be selected.")
+		pterm.Warning.Println("No support characters selected, a random character will be selected.")
 		selectedSupporterCharaters = append(selectedSupporterCharaters, CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))])
 	}
 
@@ -127,7 +131,7 @@ func getFairyTaleOptions() (selectedMainCharaters, selectedSupporterCharaters []
 	selectedLocation, _ = pterm.DefaultInteractiveSelect.WithOptions(LocationSet).WithDefaultText("Select the location").Show()
 
 	if selectedLocation == "" {
-		pterm.Error.Println("No location selected, a random location will be selected.")
+		pterm.Warning.Println("No location selected, a random location will be selected.")
 		selectedLocation = LocationSet[rand.Intn(len(LocationSet))]
 	}
 
@@ -136,7 +140,7 @@ func getFairyTaleOptions() (selectedMainCharaters, selectedSupporterCharaters []
 	storyPlot, _ = pterm.DefaultInteractiveSelect.WithOptions(StoryPlotsSet).WithDefaultText("Select the plot").Show()
 
 	if storyPlot == "" {
-		pterm.Error.Println("No plot selected, a random plot will be selected.")
+		pterm.Warning.Println("No plot selected, a random plot will be selected.")
 		storyPlot = StoryPlotsSet[rand.Intn(len(StoryPlotsSet))]
 	}
 
@@ -145,10 +149,10 @@ func getFairyTaleOptions() (selectedMainCharaters, selectedSupporterCharaters []
 	return
 }
 
-func generate(mainCharaters, supporterCharaters []string, location, storyPlot, ts string) {
-	fairyTale, prompt, err := generateFairyTale(apiKey, mainCharaters, supporterCharaters, location, storyPlot)
+func generateAndPlay(mainCharaters, supporterCharaters []string, location, storyPlot, ts string) {
+	fairyTale, prompt, err := generateFairyTaleText(apiKey, mainCharaters, supporterCharaters, location, storyPlot)
 	if err != nil {
-		fmt.Printf("Error generating fairy tale: %v\n", err)
+		pterm.Error.Printf("Error generating fairy tale: %v\n", err)
 		return
 	}
 
@@ -163,9 +167,9 @@ func generate(mainCharaters, supporterCharaters []string, location, storyPlot, t
 	fmt.Println("Generated fairy tale saved!")
 
 	outputFilename := fmt.Sprintf("%s_fairy_tale.mp3", ts)
-	err = textToSpeech(fairyTale, outputFilename)
+	err = generateAudioAndSaveToDisk(fairyTale, outputFilename)
 	if err != nil {
-		fmt.Printf("Error converting text to speech: %v\n", err)
+		pterm.Error.Printf("Error converting text to speech: %v\n", err)
 		return
 	}
 
@@ -174,7 +178,7 @@ func generate(mainCharaters, supporterCharaters []string, location, storyPlot, t
 	cmd := exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", outputFilename)
 	err = cmd.Run()
 	if err != nil {
-		fmt.Printf("Error opening audio file: %v\n", err)
+		pterm.Error.Printf("Error opening audio file: %v\n", err)
 		return
 	}
 }
@@ -183,7 +187,7 @@ func aggregateSlice(input []string) string {
 	var output string
 	for i, v := range input {
 		if i == len(input)-1 {
-			output += fmt.Sprintf("%s", v)
+			output += v
 		} else {
 			output += fmt.Sprintf("%s, ", v)
 		}
@@ -191,7 +195,7 @@ func aggregateSlice(input []string) string {
 	return output
 }
 
-func generateFairyTale(apiKey string, mainCharaters []string, supporterCharaters []string, location, storyPlot string) (string, string, error) {
+func generateFairyTaleText(apiKey string, mainCharaters []string, supporterCharaters []string, location, storyPlot string) (string, string, error) {
 
 	mainCharatersAggregated := aggregateSlice(mainCharaters)
 	supporterCharatersAggregated := aggregateSlice(supporterCharaters)
@@ -237,7 +241,7 @@ The fairy tale should be funny and entertaining for children, it should be about
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
@@ -246,9 +250,6 @@ The fairy tale should be funny and entertaining for children, it should be about
 	if err = json.Unmarshal(body, &result); err != nil {
 		return "", "", err
 	}
-
-	// fmt.Println("completions response")
-	// fmt.Println(string(body))
 
 	if result.Error.Message != "" {
 		return "", "", fmt.Errorf("OpenAI API error: %s", result.Error.Message)
@@ -285,7 +286,7 @@ type ResponseOpenAi struct {
 	} `json:"error"`
 }
 
-func textToSpeech(text, outputFilename string) error {
+func generateAudioAndSaveToDisk(text, outputFilename string) error {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -308,12 +309,12 @@ func textToSpeech(text, outputFilename string) error {
 
 	defer output.AudioStream.Close()
 
-	buf, err := ioutil.ReadAll(output.AudioStream)
+	buf, err := io.ReadAll(output.AudioStream)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(outputFilename, buf, 0644)
+	err = os.WriteFile(outputFilename, buf, 0644)
 	if err != nil {
 		return err
 	}
