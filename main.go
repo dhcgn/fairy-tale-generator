@@ -25,13 +25,13 @@ var (
 
 // Embeded text files
 var (
-	//go:embed asssets\charactersupporterset.txt
+	//go:embed asssets/charactersupporterset.txt
 	characterSupporterSetAsset string
-	//go:embed asssets\locationset.txt
+	//go:embed asssets/locationset.txt
 	locationSetAsset string
-	//go:embed asssets\storyplotsset.txt
+	//go:embed asssets/storyplotsset.txt
 	storyPlotsSetAsset string
-	//go:embed asssets\charactermainset.txt
+	//go:embed asssets/charactermainset.txt
 	characterMainSetAsset string
 )
 
