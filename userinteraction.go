@@ -6,6 +6,7 @@ import (
 	"github.com/pterm/pterm"
 )
 
+// getFairyTaleOptions returns the options for the fairy tale from user input.
 func getFairyTaleOptions() (selectedMainCharaters, selectedSupporterCharaters []string, selectedLocation, storyPlot string) {
 	selectedMainCharaters, _ = pterm.DefaultInteractiveMultiselect.WithOptions(CharacterMainSet).WithDefaultOptions(CharacterMainSet).WithDefaultText("Select the main characters").Show()
 
