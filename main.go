@@ -9,6 +9,8 @@ import (
 
 	_ "embed"
 
+	"runtime/debug"
+
 	"github.com/pterm/pterm"
 )
 
@@ -47,8 +49,20 @@ var (
 	CharacterMainSet = textToLines(characterMainSetAsset)
 )
 
+var Commit = func() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				return setting.Value
+			}
+		}
+	}
+	return ""
+}()
+
 func main() {
 	fmt.Println("Fairy Tale Generator")
+	fmt.Println("Version:", Version, "Commit:", Commit)
 	fmt.Println("https://github.com/dhcgn/fairy-tale-generator")
 	fmt.Println()
 	fmt.Println("This program uses OpenAI's GPT-3 API to generate a fairy tale in German with the help of AWS Polly.")
