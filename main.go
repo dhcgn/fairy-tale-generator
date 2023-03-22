@@ -13,6 +13,11 @@ import (
 )
 
 var (
+	// Version is the version of the program.
+	Version = "dev"
+)
+
+var (
 	apiKey       = os.Getenv("OPENAI_API_KEY")
 	awsAccessKey = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsSecretKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
