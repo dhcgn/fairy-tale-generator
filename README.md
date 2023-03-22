@@ -1,6 +1,12 @@
 # fairy-tale-generator
 
-## English/Englisch
+## Result/Ergebnis
+
+Here is the result, with a really bad visual experience for fun :smirk:.
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/P6A515DSmDo/0.jpg)](http://www.youtube.com/watch?v=P6A515DSmDo "Amy und der Brückentroll - Demo mit Chat GTP und Amazon Polly")
+
+## English/Englisch :us:
 
 A demo that showcases what Chat GPT can do for the story and Amazon Polly for the language.
 
@@ -10,7 +16,7 @@ Amazon Polly uses a neural language model to generate speech output from the tex
 
 In practice, an infinite number of stories can be generated this way. Limiting factors are the current limitations of Chat GPT in terms of complexity and length of the story, as well as the costs for using the AI SaaS, of course. Amazon Polly is currently considered to have the best language model, even though it still sounds artificial.
 
-## German/Deutsch
+## German/Deutsch :de:
 
 Eine Demo, die zeigt, was Chat GPT für die Story und Amazon Polly für die Sprache leisten können.
 
