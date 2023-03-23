@@ -32,13 +32,13 @@ In practice, an infinite number of stories can be generated this way. Limiting f
 
 ## German/Deutsch :de:
 
-Eine Demo, die zeigt, was Chat GPT für die Story und Amazon Polly für die Sprache leisten können.
+Eine Demo, die zeigt, was Chat GPT für die Geschichte und Amazon Polly für die Sprache tun können.
 
-Chat GPT erzeugt mit ein paar Eingaben vom Benutzer die Rahmenbedingungen für eine Kindergeschichte und übersetzt diese ins Deutsche. Dazu wird das Modell text-davinci-003 verwendet. Das Ergebnis ist ein Text.
+Chat GPT erzeugt mit wenigen Benutzereingaben den Rahmen für eine Kindergeschichte und übersetzt diese ins Deutsche. Dazu wird das Modell text-davinci-003 verwendet. Das Ergebnis ist ein Text.
 
-Amazon Polly nutzt ein neuronales Sprachmodell, um aus dem Text eine Sprachausgabe zu erzeugen. Diese wird als MP3 heruntergeladen.
+Amazon Polly verwendet ein neuronales Sprachmodell, um aus dem Text eine Sprachausgabe zu erzeugen. Diese wird als MP3-Datei heruntergeladen.
 
-Praktisch können so eine unendliche Menge an Geschichten erzeugt werden. Begrenzende Faktoren sind die aktuellen Limitierungen von Chat GPT hinsichtlich Komplexität und Länge der Geschichte sowie natürlich die Kosten für die Nutzung der KI-SaaS. Amazon Polly soll aktuell das beste Sprachmodell haben, auch wenn es sich immer noch künstlich anhört.
+Praktisch kann eine unendliche Anzahl von Geschichten erzeugt werden, was durch die Anzahl der Parameter und die nicht-dererministische Natur des ML-Modells gerechtfertigt ist. Begrenzende Faktoren sind die aktuellen Grenzen von Chat GPT in Bezug auf Komplexität und Länge der Geschichten und natürlich die Kosten für die Nutzung der KI SaaS. Amazon Polly gilt derzeit als das beste Sprachmodell, auch wenn es noch künstlich klingt.
 
 ## Insights
 
