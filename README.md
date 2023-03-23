@@ -32,7 +32,7 @@ In practice, an infinite number of stories can be generated this way. Limiting f
 
 ## German/Deutsch :de:
 
-Eine Demo, die zeigt, was Chat GPT für die Geschichte und Amazon Polly für die Sprache tun können.
+Dies ist nur eine Demo, die zeigt, wie Chat GPT eine Kindergeschichte und Amazon Polly die dazugehörige Sprache erzeugen kann.
 
 Chat GPT erzeugt mit wenigen Benutzereingaben den Rahmen für eine Kindergeschichte und übersetzt diese ins Deutsche. Dazu wird das Modell text-davinci-003 verwendet. Das Ergebnis ist ein Text.
 
