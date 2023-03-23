@@ -22,13 +22,13 @@ $env:AWS_SECRET_ACCESS_KEY = "..."
 
 ## English/Englisch :us:
 
-A demo that showcases what Chat GPT can do for the story and Amazon Polly for the language.
+This is just a demo that shows how Chat GPT can generate a children's story and Amazon Polly can produce the corresponding speech.
 
-Chat GPT creates the framework for a children's story based on a few inputs from the user and translates it into German. The model text-davinci-003 is used for this purpose. The result is a text.
+With only a few user inputs, Chat GPT generates the framework for a children's story and translates it into German using the text-davinci-003 model. The result is a text.
 
-Amazon Polly uses a neural language model to generate speech output from the text. This can be downloaded as an MP3.
+Amazon Polly uses a neural language model to produce a speech output from the text, which can be downloaded as an MP3 file.
 
-In practice, an infinite number of stories can be generated this way. Limiting factors are the current limitations of Chat GPT in terms of complexity and length of the story, as well as the costs for using the AI SaaS, of course. Amazon Polly is currently considered to have the best language model, even though it still sounds artificial.
+In practice, an infinite number of stories can be generated, which is justified by the number of parameters and the non-deterministic nature of the ML model. Limiting factors include the current limits of Chat GPT in terms of complexity and length of the stories, and of course, the costs associated with using the AI SaaS. Amazon Polly is currently considered the best language model, even though it still sounds artificial.
 
 ## German/Deutsch :de:
 
