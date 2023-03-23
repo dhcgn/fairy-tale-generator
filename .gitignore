@@ -2,3 +2,5 @@
 set-secret.ps1
 launch.json
 *.exe
+
+*_fairy_tale.txt

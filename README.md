@@ -6,6 +6,20 @@ Here is the result, with a really bad visual experience for fun :smirk:.
 
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/P6A515DSmDo/0.jpg)](https://www.youtube.com/watch?v=P6A515DSmDo "Amy und der Brückentroll - Demo mit Chat GTP und Amazon Polly")
 
+## Run this tool
+
+Get the Open AI API here https://openai.com/blog/openai-api and the Amazon AWS Key here https://aws.amazon.com.
+
+```powershell
+$env:OPENAI_API_KEY = "..."
+$env:OPENAI_ORGANIZATION = "..."
+
+$env:AWS_ACCESS_KEY_ID = "..."
+$env:AWS_SECRET_ACCESS_KEY = "..."
+
+.\fairy-tale-generator.exe
+```
+
 ## English/Englisch :us:
 
 A demo that showcases what Chat GPT can do for the story and Amazon Polly for the language.

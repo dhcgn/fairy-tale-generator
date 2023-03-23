@@ -40,7 +40,7 @@ The fairy tale should be funny and entertaining for children, it should be about
 }
 
 // generateFairyTaleText generates the fairy tale text with the help of the OpenAI GPT-3 API.
-func generateFairyTaleText(apiKey string, mainCharaters []string, supporterCharaters []string, location, storyPlot string) (string, string, error) {
+func generateFairyTaleText(apiKey string, orgID string, mainCharaters []string, supporterCharaters []string, location, storyPlot string) (string, string, error) {
 	prompt := generateChatGtpPrompt(mainCharaters, supporterCharaters, location, storyPlot)
 	data := map[string]interface{}{
 		"model":       "text-davinci-003", // gpt-3.5-turbo or text-davinci-003
@@ -63,7 +63,7 @@ func generateFairyTaleText(apiKey string, mainCharaters []string, supporterChara
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	req.Header.Set("OpenAI-Organization", "org-K1e47v2URc9rSlglooxQReFe")
+	req.Header.Set("OpenAI-Organization", orgID)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

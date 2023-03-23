@@ -21,6 +21,7 @@ var (
 
 var (
 	apiKey       = os.Getenv("OPENAI_API_KEY")
+	orgID        = os.Getenv("OPENAI_ORGANIZATION")
 	awsAccessKey = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsSecretKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 )
@@ -70,8 +71,8 @@ func main() {
 	pterm.Info.Printf("Loaded %v main charaters, %v support charaters, %v locations, %v plots which results in %v possible stories\n", len(CharacterMainSet), len(CharacterSupporterSet), len(LocationSet), len(StoryPlotsSet), len(CharacterMainSet)*len(CharacterSupporterSet)*len(LocationSet)*len(StoryPlotsSet))
 	fmt.Println()
 
-	if apiKey == "" || awsAccessKey == "" || awsSecretKey == "" {
-		pterm.Error.Println("Please set the environment variables OPENAI_API_KEY, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
+	if apiKey == "" || awsAccessKey == "" || awsSecretKey == "" || orgID == "" {
+		pterm.Error.Println("Please set the environment variables OPENAI_API_KEY, OPENAI_ORGANIZATION, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
 		return
 	}
 
@@ -85,7 +86,7 @@ func main() {
 
 // generateAndPlay generates the fairy tale text and audio and plays the audio.
 func generateAndPlay(mainCharaters, supporterCharaters []string, location, storyPlot, ts string) {
-	fairyTale, prompt, err := generateFairyTaleText(apiKey, mainCharaters, supporterCharaters, location, storyPlot)
+	fairyTale, prompt, err := generateFairyTaleText(apiKey, orgID, mainCharaters, supporterCharaters, location, storyPlot)
 	if err != nil {
 		pterm.Error.Printf("Error generating fairy tale: %v\n", err)
 		return
@@ -123,7 +124,7 @@ func textToLines(text string) []string {
 	lines := []string{}
 	for _, line := range strings.Split(text, "\n") {
 		if line != "" {
-			lines = append(lines, line)
+			lines = append(lines, strings.Trim(line, ""))
 		}
 	}
 	return lines
