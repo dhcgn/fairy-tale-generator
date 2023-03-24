@@ -43,6 +43,9 @@ func generateAudioFromChaptors(fairyTaleChaptors []string, outputFilename string
 	}
 
 	f, err := os.Create(outputFilename)
+	if err != nil {
+		return err
+	}
 	defer f.Close()
 
 	if err != nil {
