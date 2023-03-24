@@ -3,6 +3,7 @@ package openai
 import (
 	"bytes"
 	"encoding/json"
+	"fairy-tale-generator/story"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"github.com/pterm/pterm"
 )
 
-func New(apiKey string, orgID string, model string, story FairyTaleOptions) *OpenAI {
+func New(apiKey string, orgID string, model string, story story.FairyTaleOptions) *OpenAI {
 	return &OpenAI{
 		apiKey: apiKey,
 		orgID:  orgID,
@@ -20,51 +21,11 @@ func New(apiKey string, orgID string, model string, story FairyTaleOptions) *Ope
 	}
 }
 
-type FairyTaleOptions struct {
-	MainCharaters      []string
-	SupporterCharaters []string
-	Location           string
-	StoryPlot          string
-	ChapterCount       int
-}
-
 type OpenAI struct {
 	apiKey string
 	orgID  string
 	model  string
-	story  FairyTaleOptions
-}
-
-func aggregateSlice(input []string) string {
-	var output string
-	for i, v := range input {
-		if i == len(input)-1 {
-			output += v
-		} else {
-			output += fmt.Sprintf("%s, ", v)
-		}
-	}
-	return output
-}
-
-// generateChatGtpPrompt generates the prompt for the chat gtp
-func generateChatGtpPrompt(story FairyTaleOptions) string {
-	mainCharatersAggregated := aggregateSlice(story.MainCharaters)
-	supporterCharatersAggregated := aggregateSlice(story.SupporterCharaters)
-
-	prompt := fmt.Sprintf(`Write a children fairy tale in German with around 1200 words and the following setup.
-	
-Main characters: %s
-Support characters: %s
-
-The story takes place in %s
-The plot of the main characters is: %s
-
-The fairy tale should be funny, entertaining for children and in german.
-Write it in %v chapters and start only with the first chapter.
-`, mainCharatersAggregated, supporterCharatersAggregated, story.Location, story.StoryPlot, story.ChapterCount)
-
-	return prompt
+	story  story.FairyTaleOptions
 }
 
 type request struct {
@@ -116,7 +77,7 @@ func (ai *OpenAI) generateFairyTaleTextInternal(r request) (*ChatCompletion, err
 
 // generateFairyTaleText generates the fairy tale text with the help of the OpenAI GPT-3 API.
 func (ai *OpenAI) GenerateFairyTaleText() ([]string, string, error) {
-	prompt := generateChatGtpPrompt(ai.story)
+	prompt := story.GenerateChatGtpPrompt(ai.story)
 	conservation := []Message{
 		{assistant, prompt},
 	}

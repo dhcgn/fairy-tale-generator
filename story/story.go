@@ -1,6 +1,7 @@
 package story
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 
@@ -31,6 +32,14 @@ var (
 	CharacterMainSet = textToLinesInRandomOrder(characterMainSetAsset)
 )
 
+type FairyTaleOptions struct {
+	MainCharaters      []string
+	SupporterCharaters []string
+	Location           string
+	StoryPlot          string
+	ChapterCount       int
+}
+
 func textToLinesInRandomOrder(text string) []string {
 	lines := []string{}
 	for _, line := range strings.Split(text, "\n") {
@@ -44,4 +53,36 @@ func textToLinesInRandomOrder(text string) []string {
 	})
 
 	return lines
+}
+
+// generateChatGtpPrompt generates the prompt for the chat gtp
+func GenerateChatGtpPrompt(story FairyTaleOptions) string {
+	mainCharatersAggregated := aggregateSlice(story.MainCharaters)
+	supporterCharatersAggregated := aggregateSlice(story.SupporterCharaters)
+
+	prompt := fmt.Sprintf(`Write a long children fairy tale in German.
+	
+Main characters: %s
+Support characters: %s
+
+The story takes place in %s
+The plot of the main characters is: %s
+
+The fairy tale should be funny, entertaining for children.
+Write it in %v chapters and start only with the first chapter.
+`, mainCharatersAggregated, supporterCharatersAggregated, story.Location, story.StoryPlot, story.ChapterCount)
+
+	return prompt
+}
+
+func aggregateSlice(input []string) string {
+	var output string
+	for i, v := range input {
+		if i == len(input)-1 {
+			output += v
+		} else {
+			output += fmt.Sprintf("%s, ", v)
+		}
+	}
+	return output
 }

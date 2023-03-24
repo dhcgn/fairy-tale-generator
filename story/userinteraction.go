@@ -1,7 +1,6 @@
 package story
 
 import (
-	"fairy-tale-generator/openai"
 	"math/rand"
 	"strings"
 
@@ -10,7 +9,7 @@ import (
 )
 
 // GetFairyTaleOptions returns the options for the fairy tale from user input.
-func GetFairyTaleOptions(randomWithNoUserInput bool, count int) openai.FairyTaleOptions {
+func GetFairyTaleOptions(randomWithNoUserInput bool, count int) FairyTaleOptions {
 	if randomWithNoUserInput {
 
 		mainCharacters := []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]}
@@ -18,7 +17,7 @@ func GetFairyTaleOptions(randomWithNoUserInput bool, count int) openai.FairyTale
 			CharacterSupporterSet = append(CharacterSupporterSet, "Amy the princess")
 		}
 
-		return openai.FairyTaleOptions{
+		return FairyTaleOptions{
 			MainCharaters:      mainCharacters,
 			SupporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
 			Location:           LocationSet[rand.Intn(len(LocationSet))],
@@ -66,7 +65,7 @@ func GetFairyTaleOptions(randomWithNoUserInput bool, count int) openai.FairyTale
 
 	pterm.Info.Printfln("Selected plot: %s", pterm.Green(storyPlot))
 
-	return openai.FairyTaleOptions{
+	return FairyTaleOptions{
 		MainCharaters:      selectedMainCharaters,
 		SupporterCharaters: selectedSupporterCharaters,
 		Location:           selectedLocation,
