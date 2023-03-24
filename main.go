@@ -164,6 +164,6 @@ func textToLines(text string) []string {
 }
 
 func createTimestamp() string {
-	now := time.Now().UTC()
+	now := time.Now()
 	return now.Format("2006-01-02_15-04-05")
 }
