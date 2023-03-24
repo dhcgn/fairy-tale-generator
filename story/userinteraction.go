@@ -1,4 +1,4 @@
-package main
+package story
 
 import (
 	"fairy-tale-generator/openai"
@@ -9,8 +9,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// getFairyTaleOptions returns the options for the fairy tale from user input.
-func getFairyTaleOptions(randomWithNoUserInput bool, count int) openai.FairyTaleOptions {
+// GetFairyTaleOptions returns the options for the fairy tale from user input.
+func GetFairyTaleOptions(randomWithNoUserInput bool, count int) openai.FairyTaleOptions {
 	if randomWithNoUserInput {
 
 		mainCharacters := []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]}
