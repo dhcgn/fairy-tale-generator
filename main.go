@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -15,6 +16,7 @@ import (
 
 	"runtime/debug"
 
+	"github.com/joho/godotenv"
 	"github.com/pterm/pterm"
 )
 
@@ -68,6 +70,14 @@ var Commit = func() string {
 	}
 	return ""
 }()
+
+func init() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
 
 func main() {
 	fmt.Println("Fairy Tale Generator")

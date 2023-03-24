@@ -4,6 +4,8 @@ go 1.20
 
 require github.com/pterm/pterm v0.12.56
 
+require github.com/joho/godotenv v1.5.1 // indirect
+
 require (
 	atomicgo.dev/cursor v0.1.1 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
