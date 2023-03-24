@@ -2,8 +2,10 @@ package main
 
 import (
 	"math/rand"
+	"strings"
 
 	"github.com/pterm/pterm"
+	"golang.org/x/exp/slices"
 )
 
 type fairyTaleOptions struct {
@@ -16,8 +18,14 @@ type fairyTaleOptions struct {
 // getFairyTaleOptions returns the options for the fairy tale from user input.
 func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
 	if randomWithNoUserInput {
+
+		mainCharacters := []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]}
+		if slices.IndexFunc(mainCharacters, func(c string) bool { return strings.EqualFold(c, "Amy") }) == -1 {
+			CharacterSupporterSet = append(CharacterSupporterSet, "Amy the princess")
+		}
+
 		return fairyTaleOptions{
-			mainCharaters:      []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]},
+			mainCharaters:      mainCharacters,
 			supporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
 			location:           LocationSet[rand.Intn(len(LocationSet))],
 			storyPlot:          StoryPlotSet[rand.Intn(len(StoryPlotSet))],
