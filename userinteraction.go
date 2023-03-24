@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fairy-tale-generator/openai"
 	"math/rand"
 	"strings"
 
@@ -8,15 +9,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type fairyTaleOptions struct {
-	mainCharaters      []string
-	supporterCharaters []string
-	location           string
-	storyPlot          string
-}
-
 // getFairyTaleOptions returns the options for the fairy tale from user input.
-func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
+func getFairyTaleOptions(randomWithNoUserInput bool, count int) openai.FairyTaleOptions {
 	if randomWithNoUserInput {
 
 		mainCharacters := []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]}
@@ -24,11 +18,12 @@ func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
 			CharacterSupporterSet = append(CharacterSupporterSet, "Amy the princess")
 		}
 
-		return fairyTaleOptions{
-			mainCharaters:      mainCharacters,
-			supporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
-			location:           LocationSet[rand.Intn(len(LocationSet))],
-			storyPlot:          StoryPlotSet[rand.Intn(len(StoryPlotSet))],
+		return openai.FairyTaleOptions{
+			MainCharaters:      mainCharacters,
+			SupporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
+			Location:           LocationSet[rand.Intn(len(LocationSet))],
+			StoryPlot:          StoryPlotSet[rand.Intn(len(StoryPlotSet))],
+			ChapterCount:       count,
 		}
 	}
 
@@ -71,10 +66,11 @@ func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
 
 	pterm.Info.Printfln("Selected plot: %s", pterm.Green(storyPlot))
 
-	return fairyTaleOptions{
-		mainCharaters:      selectedMainCharaters,
-		supporterCharaters: selectedSupporterCharaters,
-		location:           selectedLocation,
-		storyPlot:          storyPlot,
+	return openai.FairyTaleOptions{
+		MainCharaters:      selectedMainCharaters,
+		SupporterCharaters: selectedSupporterCharaters,
+		Location:           selectedLocation,
+		StoryPlot:          storyPlot,
+		ChapterCount:       count,
 	}
 }

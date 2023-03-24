@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fairy-tale-generator/amazonpolly"
+	"fairy-tale-generator/openai"
 	"flag"
 	"fmt"
 	"log"
@@ -35,10 +37,10 @@ const (
 )
 
 var (
-	apiKey       = os.Getenv("OPENAI_API_KEY")
-	orgID        = os.Getenv("OPENAI_ORGANIZATION")
-	awsAccessKey = os.Getenv("AWS_ACCESS_KEY_ID")
-	awsSecretKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
+	apiKey             = os.Getenv("OPENAI_API_KEY")
+	orgID              = os.Getenv("OPENAI_ORGANIZATION")
+	awsKeyId           = os.Getenv("AWS_ACCESS_KEY_ID")
+	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 )
 
 // Embeded text files
@@ -101,7 +103,7 @@ func main() {
 
 	flag.Parse()
 
-	if apiKey == "" || awsAccessKey == "" || awsSecretKey == "" || orgID == "" {
+	if apiKey == "" || awsKeyId == "" || awsSecretAccessKey == "" || orgID == "" {
 		pterm.Error.Println("Please set the environment variables OPENAI_API_KEY, OPENAI_ORGANIZATION, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
 		return
 	}
@@ -113,16 +115,19 @@ func main() {
 		return
 	}
 
-	fairyTaleOptions := getFairyTaleOptions(*flatSetRandomOptions)
+	fairyTaleOptions := getFairyTaleOptions(*flatSetRandomOptions, ChapterCount)
 
-	generateAndPlay(fairyTaleOptions, targetFolder)
+	openai := openai.New(apiKey, orgID, model, fairyTaleOptions)
+	amazonpolly := amazonpolly.New(awsKeyId, awsSecretAccessKey)
+
+	generateAndPlay(targetFolder, openai, amazonpolly)
 }
 
 // generateAndPlay generates the fairy tale text and audio and plays the audio.
-func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
+func generateAndPlay(targetFolder string, openai *openai.OpenAI, amazonpolly *amazonpolly.AmazonPolly) {
 	pterm.Info.Println("Generating fairy tale")
 
-	fairyTaleChaptors, prompt, err := generateFairyTaleText(apiKey, orgID, opts)
+	fairyTaleChaptors, prompt, err := openai.GenerateFairyTaleText()
 	if err != nil {
 		pterm.Error.Printf("Error generating fairy tale: %v\n", err)
 		return
@@ -142,7 +147,7 @@ func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
 	pterm.Info.Println("Generating audio from fairy tale")
 
 	outputFilename := filepath.Join(targetFolder, fmt.Sprintf("%s_fairy_tale.mp3", ts))
-	generateAudioFromChaptors(fairyTaleChaptors, outputFilename)
+	amazonpolly.GenerateAudioFromChaptors(fairyTaleChaptors, outputFilename)
 
 	pterm.Info.Printf("German audio saved to: %s\n", outputFilename)
 
