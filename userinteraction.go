@@ -14,7 +14,16 @@ type fairyTaleOptions struct {
 }
 
 // getFairyTaleOptions returns the options for the fairy tale from user input.
-func getFairyTaleOptions() fairyTaleOptions {
+func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
+	if randomWithNoUserInput {
+		return fairyTaleOptions{
+			mainCharaters:      []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]},
+			supporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
+			location:           LocationSet[rand.Intn(len(LocationSet))],
+			storyPlot:          StoryPlotSet[rand.Intn(len(StoryPlotSet))],
+		}
+	}
+
 	selectedMainCharaters, _ := pterm.DefaultInteractiveMultiselect.WithOptions(CharacterMainSet).WithDefaultOptions(CharacterMainSet).WithDefaultText("Select the main characters").Show()
 
 	if len(selectedMainCharaters) == 0 {
@@ -42,11 +51,11 @@ func getFairyTaleOptions() fairyTaleOptions {
 
 	pterm.Info.Printfln("Selected location: %s", pterm.Green(selectedLocation))
 
-	storyPlot, _ := pterm.DefaultInteractiveSelect.WithOptions(StoryPlotsSet).WithDefaultText("Select the plot").Show()
+	storyPlot, _ := pterm.DefaultInteractiveSelect.WithOptions(StoryPlotSet).WithDefaultText("Select the plot").Show()
 
 	if storyPlot == "" {
 		pterm.Warning.Println("No plot selected, a random plot will be selected.")
-		storyPlot = StoryPlotsSet[rand.Intn(len(StoryPlotsSet))]
+		storyPlot = StoryPlotSet[rand.Intn(len(StoryPlotSet))]
 	}
 
 	pterm.Info.Printfln("Selected plot: %s", pterm.Green(storyPlot))

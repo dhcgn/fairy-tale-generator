@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -46,10 +48,14 @@ var (
 	CharacterSupporterSet = textToLines(characterSupporterSetAsset)
 	// LocationSet is the set of locations for the fairy tale.
 	LocationSet = textToLines(locationSetAsset)
-	// StoryPlotsSet is the set of story plots for the fairy tale.
-	StoryPlotsSet = textToLines(storyPlotsSetAsset)
+	// StoryPlotSet is the set of story plots for the fairy tale.
+	StoryPlotSet = textToLines(storyPlotsSetAsset)
 	// CharacterMainSet is the set of main characters for the fairy tale.
 	CharacterMainSet = textToLines(characterMainSetAsset)
+)
+
+var (
+	flatSetRandomOptions = flag.Bool("random", false, "Use a flat set of random options instead of the default interactive options")
 )
 
 var Commit = func() string {
@@ -70,8 +76,10 @@ func main() {
 	fmt.Println()
 	fmt.Println("This program uses OpenAI's GPT-3 API to generate a fairy tale in German with the help of AWS Polly.")
 	fmt.Println()
-	pterm.Info.Printf("Loaded %v main charaters, %v support charaters, %v locations, %v plots which results in %v possible stories\n", len(CharacterMainSet), len(CharacterSupporterSet), len(LocationSet), len(StoryPlotsSet), len(CharacterMainSet)*len(CharacterSupporterSet)*len(LocationSet)*len(StoryPlotsSet))
+	pterm.Info.Printf("Loaded %v main charaters, %v support charaters, %v locations, %v plots which results in %v possible stories\n", len(CharacterMainSet), len(CharacterSupporterSet), len(LocationSet), len(StoryPlotSet), len(CharacterMainSet)*len(CharacterSupporterSet)*len(LocationSet)*len(StoryPlotSet))
 	fmt.Println()
+
+	flag.Parse()
 
 	if apiKey == "" || awsAccessKey == "" || awsSecretKey == "" || orgID == "" {
 		pterm.Error.Println("Please set the environment variables OPENAI_API_KEY, OPENAI_ORGANIZATION, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
@@ -85,7 +93,7 @@ func main() {
 		return
 	}
 
-	fairyTaleOptions := getFairyTaleOptions()
+	fairyTaleOptions := getFairyTaleOptions(*flatSetRandomOptions)
 
 	generateAndPlay(fairyTaleOptions, targetFolder)
 }
@@ -136,6 +144,11 @@ func textToLines(text string) []string {
 			lines = append(lines, strings.Trim(line, ""))
 		}
 	}
+
+	rand.Shuffle(len(lines), func(i, j int) {
+		lines[i], lines[j] = lines[j], lines[i]
+	})
+
 	return lines
 }
 

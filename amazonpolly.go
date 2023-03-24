@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -68,12 +69,18 @@ func generateAudioAndSaveToDisk(text, outputFilename string) error {
 
 	svc := polly.New(sess, aws.NewConfig().WithRegion("eu-central-1"))
 
+	supportNeuralVoices := []string{"Vicki", "Daniel"}
+	supportNeuralVoicesIndex := rand.Intn(len(supportNeuralVoices))
+	selectvoice := supportNeuralVoices[supportNeuralVoicesIndex]
+
+	pterm.Info.Printf("Using neural voice '%v' from Amazon Polly\n", selectvoice)
+
 	input := &polly.SynthesizeSpeechInput{
 		OutputFormat: aws.String("mp3"),
 		SampleRate:   aws.String("22050"),
 		Text:         aws.String(text),
 		TextType:     aws.String("text"),
-		VoiceId:      aws.String("Daniel"), // German voice
+		VoiceId:      aws.String(selectvoice),
 		Engine:       aws.String("neural"),
 	}
 
