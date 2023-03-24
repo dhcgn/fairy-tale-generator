@@ -90,8 +90,8 @@ func generateFairyTaleTextInternal(apiKey string, r request) (*ChatCompletion, e
 }
 
 // generateFairyTaleText generates the fairy tale text with the help of the OpenAI GPT-3 API.
-func generateFairyTaleText(apiKey string, orgID string, mainCharaters []string, supporterCharaters []string, location, storyPlot string) ([]string, string, error) {
-	prompt := generateChatGtpPrompt(mainCharaters, supporterCharaters, location, storyPlot)
+func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) ([]string, string, error) {
+	prompt := generateChatGtpPrompt(opts.mainCharaters, opts.supporterCharaters, opts.location, opts.storyPlot)
 	conservation := []Message{
 		{assistant, prompt},
 	}

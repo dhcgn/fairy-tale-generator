@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -76,23 +78,30 @@ func main() {
 		return
 	}
 
-	selectedMainCharaters, selectedSupporterCharaters, location, storyPlot := getFairyTaleOptions()
+	targetFolder := "results"
+	err := os.Mkdir(targetFolder, 0755)
+	if err != nil && !os.IsExist(err) {
+		pterm.Error.Printf("Error creating results directory: %v\n", err)
+		return
+	}
 
-	ts := createTimestamp()
-	generateAndPlay(selectedMainCharaters, selectedSupporterCharaters, location, storyPlot, ts)
+	fairyTaleOptions := getFairyTaleOptions()
+
+	generateAndPlay(fairyTaleOptions, targetFolder)
 }
 
 // generateAndPlay generates the fairy tale text and audio and plays the audio.
-func generateAndPlay(mainCharaters, supporterCharaters []string, location, storyPlot, ts string) {
+func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
 	pterm.Info.Println("Generating fairy tale")
 
-	fairyTaleChaptors, prompt, err := generateFairyTaleText(apiKey, orgID, mainCharaters, supporterCharaters, location, storyPlot)
+	fairyTaleChaptors, prompt, err := generateFairyTaleText(apiKey, orgID, opts)
 	if err != nil {
 		pterm.Error.Printf("Error generating fairy tale: %v\n", err)
 		return
 	}
 
-	f, _ := os.Create(fmt.Sprintf("%s_fairy_tale.txt", ts))
+	ts := createTimestamp()
+	f, _ := os.Create(filepath.Join(targetFolder, fmt.Sprintf("%s_fairy_tale.txt", ts)))
 	defer f.Close()
 
 	f.WriteString("Prompt:\n")
@@ -104,17 +113,19 @@ func generateAndPlay(mainCharaters, supporterCharaters []string, location, story
 
 	pterm.Info.Println("Generating audio from fairy tale")
 
-	outputFilename := fmt.Sprintf("%s_fairy_tale.mp3", ts)
+	outputFilename := filepath.Join(targetFolder, fmt.Sprintf("%s_fairy_tale.mp3", ts))
 	generateAudioFromChaptors(fairyTaleChaptors, outputFilename)
 
 	pterm.Info.Printf("German audio saved to: %s\n", outputFilename)
 
-	// Open the audio file on windows
-	cmd := exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", outputFilename)
-	err = cmd.Run()
-	if err != nil {
-		pterm.Error.Printf("Error opening audio file: %v\n", err)
-		return
+	if runtime.GOOS == "windows" {
+		// Open the audio file on windows
+		cmd := exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", outputFilename)
+		err = cmd.Run()
+		if err != nil {
+			pterm.Error.Printf("Error opening audio file: %v\n", err)
+			return
+		}
 	}
 }
 
