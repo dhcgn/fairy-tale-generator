@@ -60,7 +60,7 @@ func GenerateChatGtpPrompt(story FairyTaleOptions) string {
 	mainCharatersAggregated := aggregateSlice(story.MainCharaters)
 	supporterCharatersAggregated := aggregateSlice(story.SupporterCharaters)
 
-	prompt := fmt.Sprintf(`Write a long children fairy tale in German.
+	prompt := fmt.Sprintf(`Write a children fairy tale in German.
 	
 Main characters: %s
 Support characters: %s
@@ -68,7 +68,7 @@ Support characters: %s
 The story takes place in %s
 The plot of the main characters is: %s
 
-The fairy tale should be funny, entertaining for children.
+The fairy tale should be funny, entertaining for children and kindly.
 Write it in %v chapters and start only with the first chapter.
 `, mainCharatersAggregated, supporterCharatersAggregated, story.Location, story.StoryPlot, story.ChapterCount)
 
