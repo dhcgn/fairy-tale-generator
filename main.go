@@ -78,15 +78,15 @@ func main() {
 
 	selectedMainCharaters, selectedSupporterCharaters, location, storyPlot := getFairyTaleOptions()
 
-	pterm.Info.Println("Generating fairy tale...")
-
 	ts := createTimestamp()
 	generateAndPlay(selectedMainCharaters, selectedSupporterCharaters, location, storyPlot, ts)
 }
 
 // generateAndPlay generates the fairy tale text and audio and plays the audio.
 func generateAndPlay(mainCharaters, supporterCharaters []string, location, storyPlot, ts string) {
-	fairyTale, prompt, err := generateFairyTaleText(apiKey, orgID, mainCharaters, supporterCharaters, location, storyPlot)
+	pterm.Info.Println("Generating fairy tale")
+
+	fairyTaleChaptors, prompt, err := generateFairyTaleText(apiKey, orgID, mainCharaters, supporterCharaters, location, storyPlot)
 	if err != nil {
 		pterm.Error.Printf("Error generating fairy tale: %v\n", err)
 		return
@@ -98,18 +98,16 @@ func generateAndPlay(mainCharaters, supporterCharaters []string, location, story
 	f.WriteString("Prompt:\n")
 	f.WriteString(prompt)
 	f.WriteString("\n\nPlot:\n")
-	f.WriteString(fairyTale)
+	f.WriteString(strings.Join(fairyTaleChaptors, "\n\n"))
 
-	fmt.Println("Generated fairy tale saved!")
+	pterm.Info.Println("Generated fairy tale saved!")
+
+	pterm.Info.Println("Generating audio from fairy tale")
 
 	outputFilename := fmt.Sprintf("%s_fairy_tale.mp3", ts)
-	err = generateAudioAndSaveToDisk(fairyTale, outputFilename)
-	if err != nil {
-		pterm.Error.Printf("Error converting text to speech: %v\n", err)
-		return
-	}
+	generateAudioFromChaptors(fairyTaleChaptors, outputFilename)
 
-	fmt.Printf("German audio saved to: %s\n", outputFilename)
+	pterm.Info.Printf("German audio saved to: %s\n", outputFilename)
 
 	// Open the audio file on windows
 	cmd := exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", outputFilename)
