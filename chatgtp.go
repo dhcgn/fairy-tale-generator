@@ -28,16 +28,17 @@ func generateChatGtpPrompt(mainCharaters []string, supporterCharaters []string, 
 	mainCharatersAggregated := aggregateSlice(mainCharaters)
 	supporterCharatersAggregated := aggregateSlice(supporterCharaters)
 
-	prompt := fmt.Sprintf(`Create a children fairy tale in German with the following setup.
+	prompt := fmt.Sprintf(`Write a children fairy tale in German with around 1200 words and the following setup.
 	
-main characters: %s
-support characters: %s
+Main characters: %s
+Support characters: %s
 
-the story takes place in %s
-the plot of the main characters is %s
+The story takes place in %s
+The plot of the main characters is: %s
 
-The fairy tale should be funny and entertaining for children, write it in in 3 chapters. Start only with the first chapter.
-`, mainCharatersAggregated, supporterCharatersAggregated, location, storyPlot)
+The fairy tale should be funny, entertaining for children and in german.
+Write it in %v chapters and start only with the first chapter.
+`, mainCharatersAggregated, supporterCharatersAggregated, location, storyPlot, ChapterCount)
 
 	return prompt
 }
@@ -90,21 +91,19 @@ func generateFairyTaleTextInternal(apiKey string, r request) (*ChatCompletion, e
 }
 
 // generateFairyTaleText generates the fairy tale text with the help of the OpenAI GPT-3 API.
-func generateFairyTaleText(apiKey string, orgID string, mainCharaters []string, supporterCharaters []string, location, storyPlot string) ([]string, string, error) {
-	prompt := generateChatGtpPrompt(mainCharaters, supporterCharaters, location, storyPlot)
+func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) ([]string, string, error) {
+	prompt := generateChatGtpPrompt(opts.mainCharaters, opts.supporterCharaters, opts.location, opts.storyPlot)
 	conservation := []Message{
 		{assistant, prompt},
 	}
 	data := request{
-		Model:    "gpt-3.5-turbo",
+		Model:    model,
 		Messages: conservation,
-		//MaxTokens: 4_096 - getCharsInConversation(conservation)/3,
 	}
-	// max tokens: https://platform.openai.com/docs/models/gpt-4
 
 	chapters := []string{}
 
-	pterm.Info.Println("Generating 1. chapter ...")
+	pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", 1, model)
 
 	response, err := generateFairyTaleTextInternal(apiKey, data)
 
@@ -119,13 +118,12 @@ func generateFairyTaleText(apiKey string, orgID string, mainCharaters []string, 
 	conservation = append(conservation, response.Choices[0].Message)
 	conservation = append(conservation, Message{assistant, "Write next chapter."})
 
-	for i := 0; i < 2; i++ {
-		pterm.Info.Printf("Generating %v. chapter ...\n", i+2)
+	for i := 0; i < ChapterCount-1; i++ {
+		pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", i+2, model)
 
 		response, err = generateFairyTaleTextInternal(apiKey, request{
-			Model:    "gpt-3.5-turbo",
+			Model:    model,
 			Messages: conservation,
-			// MaxTokens: 4_096 - getCharsInConversation(conservation)/4 - 100,
 		})
 		if err != nil {
 			return nil, "", err

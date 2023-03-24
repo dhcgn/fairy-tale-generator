@@ -16,12 +16,9 @@ var (
 
 func Test_generateFairyTaleText(t *testing.T) {
 	type args struct {
-		apiKey             string
-		orgID              string
-		mainCharaters      []string
-		supporterCharaters []string
-		location           string
-		storyPlot          string
+		apiKey string
+		orgID  string
+		opts   fairyTaleOptions
 	}
 	tests := []struct {
 		name    string
@@ -33,12 +30,14 @@ func Test_generateFairyTaleText(t *testing.T) {
 		{
 			name: "test1",
 			args: args{
-				apiKey:             OPENAI_API_KEY,
-				orgID:              OPENAI_ORGANIZATION,
-				mainCharaters:      []string{"Amy"},
-				supporterCharaters: []string{"Bob"},
-				location:           "Germany",
-				storyPlot:          "Amy is a princess",
+				apiKey: OPENAI_API_KEY,
+				orgID:  OPENAI_ORGANIZATION,
+				opts: fairyTaleOptions{
+					mainCharaters:      []string{"Amy"},
+					supporterCharaters: []string{"Bob"},
+					location:           "Germany",
+					storyPlot:          "Amy is a princess",
+				},
 			},
 			want:  nil,
 			want1: "",
@@ -46,7 +45,7 @@ func Test_generateFairyTaleText(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, _, err := generateFairyTaleText(tt.args.apiKey, tt.args.orgID, tt.args.mainCharaters, tt.args.supporterCharaters, tt.args.location, tt.args.storyPlot)
+			_, _, err := generateFairyTaleText(tt.args.apiKey, tt.args.orgID, tt.args.opts)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("generateFairyTaleText() error = %v, wantErr %v", err, tt.wantErr)
 				return

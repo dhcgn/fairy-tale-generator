@@ -4,7 +4,11 @@
 
 Here is the result, with a really bad visual experience for fun :smirk:.
 
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/P6A515DSmDo/0.jpg)](https://www.youtube.com/watch?v=P6A515DSmDo "Amy und der Brückentroll - Demo mit Chat GTP und Amazon Polly")
+[![Amy und der Brückentroll - Demo mit Chat GTP und Amazon Polly](https://img.youtube.com/vi/P6A515DSmDo/0.jpg)](https://www.youtube.com/watch?v=P6A515DSmDo "Amy und der Brückentroll - Demo mit Chat GTP und Amazon Polly")
+
+This is what the user experience of this tool looks like:
+
+[![fairy tale generator ux](https://img.youtube.com/vi/QjukNvGkW1U/0.jpg)](https://www.youtube.com/watch?v=QjukNvGkW1U "fairy tale generator ux")
 
 ## Run this tool
 
