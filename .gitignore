@@ -4,5 +4,6 @@ launch.json
 *.exe
 
 secrets/
+*.secret.*
 
 *_fairy_tale.txt
