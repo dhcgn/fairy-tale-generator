@@ -1,8 +1,9 @@
-package main
+package openai
 
 import (
 	"bytes"
 	"encoding/json"
+	"fairy-tale-generator/story"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,36 +12,20 @@ import (
 	"github.com/pterm/pterm"
 )
 
-func aggregateSlice(input []string) string {
-	var output string
-	for i, v := range input {
-		if i == len(input)-1 {
-			output += v
-		} else {
-			output += fmt.Sprintf("%s, ", v)
-		}
+func New(apiKey string, orgID string, model string, story story.FairyTaleOptions) *OpenAI {
+	return &OpenAI{
+		apiKey: apiKey,
+		orgID:  orgID,
+		model:  model,
+		story:  story,
 	}
-	return output
 }
 
-// generateChatGtpPrompt generates the prompt for the chat gtp
-func generateChatGtpPrompt(mainCharaters []string, supporterCharaters []string, location, storyPlot string) string {
-	mainCharatersAggregated := aggregateSlice(mainCharaters)
-	supporterCharatersAggregated := aggregateSlice(supporterCharaters)
-
-	prompt := fmt.Sprintf(`Write a children fairy tale in German with around 1200 words and the following setup.
-	
-Main characters: %s
-Support characters: %s
-
-The story takes place in %s
-The plot of the main characters is: %s
-
-The fairy tale should be funny, entertaining for children and in german.
-Write it in %v chapters and start only with the first chapter.
-`, mainCharatersAggregated, supporterCharatersAggregated, location, storyPlot, ChapterCount)
-
-	return prompt
+type OpenAI struct {
+	apiKey string
+	orgID  string
+	model  string
+	story  story.FairyTaleOptions
 }
 
 type request struct {
@@ -56,7 +41,7 @@ const (
 	user      = "user"
 )
 
-func generateFairyTaleTextInternal(apiKey string, r request) (*ChatCompletion, error) {
+func (ai *OpenAI) generateFairyTaleTextInternal(r request) (*ChatCompletion, error) {
 	jsonData, err := json.Marshal(r)
 	if err != nil {
 		return nil, err
@@ -68,8 +53,8 @@ func generateFairyTaleTextInternal(apiKey string, r request) (*ChatCompletion, e
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	req.Header.Set("OpenAI-Organization", orgID)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ai.apiKey))
+	req.Header.Set("OpenAI-Organization", ai.orgID)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -91,21 +76,21 @@ func generateFairyTaleTextInternal(apiKey string, r request) (*ChatCompletion, e
 }
 
 // generateFairyTaleText generates the fairy tale text with the help of the OpenAI GPT-3 API.
-func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) ([]string, string, error) {
-	prompt := generateChatGtpPrompt(opts.mainCharaters, opts.supporterCharaters, opts.location, opts.storyPlot)
+func (ai *OpenAI) GenerateFairyTaleText() ([]string, string, error) {
+	prompt := story.GenerateChatGtpPrompt(ai.story)
 	conservation := []Message{
 		{assistant, prompt},
 	}
 	data := request{
-		Model:    model,
+		Model:    ai.model,
 		Messages: conservation,
 	}
 
 	chapters := []string{}
 
-	pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", 1, model)
+	pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", 1, ai.model)
 
-	response, err := generateFairyTaleTextInternal(apiKey, data)
+	response, err := ai.generateFairyTaleTextInternal(data)
 
 	if err != nil {
 		return nil, "", err
@@ -118,11 +103,11 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 	conservation = append(conservation, response.Choices[0].Message)
 	conservation = append(conservation, Message{assistant, "Write next chapter."})
 
-	for i := 0; i < ChapterCount-1; i++ {
-		pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", i+2, model)
+	for i := 0; i < ai.story.ChapterCount-1; i++ {
+		pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", i+2, ai.model)
 
-		response, err = generateFairyTaleTextInternal(apiKey, request{
-			Model:    model,
+		response, err = ai.generateFairyTaleTextInternal(request{
+			Model:    ai.model,
 			Messages: conservation,
 		})
 		if err != nil {

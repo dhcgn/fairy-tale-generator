@@ -1,4 +1,4 @@
-package main
+package amazonpolly
 
 import (
 	"fmt"
@@ -13,7 +13,23 @@ import (
 	"github.com/pterm/pterm"
 )
 
-func generateAudioFromChaptors(fairyTaleChaptors []string, outputFilename string) error {
+func New(awsKeyId string, awsSecretAccessKey string) *AmazonPolly {
+	return &AmazonPolly{
+		awsKeyId:           awsKeyId,
+		awsSecretAccessKey: awsSecretAccessKey,
+	}
+}
+
+type AmazonPolly struct {
+	awsKeyId           string
+	awsSecretAccessKey string
+}
+
+func (polly *AmazonPolly) GenerateAudioFromChaptors(fairyTaleChaptors []string, outputFilename string) error {
+
+	os.Setenv("AWS_ACCESS_KEY_ID", polly.awsKeyId)
+	os.Setenv("AWS_SECRET_ACCESS_KEY", polly.awsSecretAccessKey)
+
 	joiner := mp3join.New()
 
 	for i, fairyTaleChaptor := range fairyTaleChaptors {

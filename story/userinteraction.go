@@ -1,4 +1,4 @@
-package main
+package story
 
 import (
 	"math/rand"
@@ -8,15 +8,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type fairyTaleOptions struct {
-	mainCharaters      []string
-	supporterCharaters []string
-	location           string
-	storyPlot          string
-}
-
-// getFairyTaleOptions returns the options for the fairy tale from user input.
-func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
+// GetFairyTaleOptions returns the options for the fairy tale from user input.
+func GetFairyTaleOptions(randomWithNoUserInput bool, count int) FairyTaleOptions {
 	if randomWithNoUserInput {
 
 		mainCharacters := []string{CharacterMainSet[rand.Intn(len(CharacterMainSet))]}
@@ -24,11 +17,12 @@ func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
 			CharacterSupporterSet = append(CharacterSupporterSet, "Amy the princess")
 		}
 
-		return fairyTaleOptions{
-			mainCharaters:      mainCharacters,
-			supporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
-			location:           LocationSet[rand.Intn(len(LocationSet))],
-			storyPlot:          StoryPlotSet[rand.Intn(len(StoryPlotSet))],
+		return FairyTaleOptions{
+			MainCharaters:      mainCharacters,
+			SupporterCharaters: []string{CharacterSupporterSet[rand.Intn(len(CharacterSupporterSet))]},
+			Location:           LocationSet[rand.Intn(len(LocationSet))],
+			StoryPlot:          StoryPlotSet[rand.Intn(len(StoryPlotSet))],
+			ChapterCount:       count,
 		}
 	}
 
@@ -71,10 +65,11 @@ func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
 
 	pterm.Info.Printfln("Selected plot: %s", pterm.Green(storyPlot))
 
-	return fairyTaleOptions{
-		mainCharaters:      selectedMainCharaters,
-		supporterCharaters: selectedSupporterCharaters,
-		location:           selectedLocation,
-		storyPlot:          storyPlot,
+	return FairyTaleOptions{
+		MainCharaters:      selectedMainCharaters,
+		SupporterCharaters: selectedSupporterCharaters,
+		Location:           selectedLocation,
+		StoryPlot:          storyPlot,
+		ChapterCount:       count,
 	}
 }

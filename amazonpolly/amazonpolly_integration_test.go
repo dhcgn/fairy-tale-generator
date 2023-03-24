@@ -1,10 +1,9 @@
 //go:build integration
 
-package main
+package amazonpolly
 
 import (
 	_ "embed"
-	"os"
 	"testing"
 )
 
@@ -15,22 +14,23 @@ var (
 	AWS_SECRET_ACCESS_KEY string
 )
 
-func Test_generateAudioFromChaptors(t *testing.T) {
-
-	os.Setenv("AWS_ACCESS_KEY_ID", AWS_ACCESS_KEY_ID)
-	os.Setenv("AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCESS_KEY)
-
+func TestAmazonPolly_GenerateAudioFromChaptors(t *testing.T) {
 	type args struct {
 		fairyTaleChaptors []string
 		outputFilename    string
 	}
 	tests := []struct {
 		name    string
+		polly   *AmazonPolly
 		args    args
 		wantErr bool
 	}{
 		{
 			name: "test1",
+			polly: &AmazonPolly{
+				awsKeyId:           AWS_ACCESS_KEY_ID,
+				awsSecretAccessKey: AWS_SECRET_ACCESS_KEY,
+			},
 			args: args{
 				fairyTaleChaptors: []string{"Amy is a princess", "Bob is a prince", "They are in Germany"},
 				outputFilename:    `C:\temp\test.mp3`,
@@ -39,8 +39,8 @@ func Test_generateAudioFromChaptors(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := generateAudioFromChaptors(tt.args.fairyTaleChaptors, tt.args.outputFilename); (err != nil) != tt.wantErr {
-				t.Errorf("generateAudioFromChaptors() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.polly.GenerateAudioFromChaptors(tt.args.fairyTaleChaptors, tt.args.outputFilename); (err != nil) != tt.wantErr {
+				t.Errorf("AmazonPolly.GenerateAudioFromChaptors() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

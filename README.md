@@ -21,6 +21,10 @@ $env:OPENAI_ORGANIZATION = "..."
 $env:AWS_ACCESS_KEY_ID = "..."
 $env:AWS_SECRET_ACCESS_KEY = "..."
 
+# Unantended mode
+.\fairy-tale-generator.exe --random
+
+# Interactive mode
 .\fairy-tale-generator.exe
 ```
 

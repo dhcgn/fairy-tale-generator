@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fairy-tale-generator/amazonpolly"
+	"fairy-tale-generator/openai"
+	"fairy-tale-generator/story"
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,7 +23,7 @@ import (
 )
 
 var (
-	// Version is the version of the program.
+	// Version of this program, set during compile time.
 	Version = "dev"
 )
 
@@ -34,39 +36,16 @@ const (
 	model = "gpt-3.5-turbo"
 )
 
+// Secrets for the APIs
 var (
-	apiKey       = os.Getenv("OPENAI_API_KEY")
-	orgID        = os.Getenv("OPENAI_ORGANIZATION")
-	awsAccessKey = os.Getenv("AWS_ACCESS_KEY_ID")
-	awsSecretKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-)
-
-// Embeded text files
-var (
-	//go:embed asssets/charactersupporterset.txt
-	characterSupporterSetAsset string
-	//go:embed asssets/locationset.txt
-	locationSetAsset string
-	//go:embed asssets/storyplotsset.txt
-	storyPlotsSetAsset string
-	//go:embed asssets/charactermainset.txt
-	characterMainSetAsset string
-)
-
-// Options for the fairy tale
-var (
-	// CharacterSupporterSet is the set of supporter characters for the fairy tale.
-	CharacterSupporterSet = textToLinesInRandomOrder(characterSupporterSetAsset)
-	// LocationSet is the set of locations for the fairy tale.
-	LocationSet = textToLinesInRandomOrder(locationSetAsset)
-	// StoryPlotSet is the set of story plots for the fairy tale.
-	StoryPlotSet = textToLinesInRandomOrder(storyPlotsSetAsset)
-	// CharacterMainSet is the set of main characters for the fairy tale.
-	CharacterMainSet = textToLinesInRandomOrder(characterMainSetAsset)
+	apiKey             = os.Getenv("OPENAI_API_KEY")
+	orgID              = os.Getenv("OPENAI_ORGANIZATION")
+	awsKeyId           = os.Getenv("AWS_ACCESS_KEY_ID")
+	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 )
 
 var (
-	flatSetRandomOptions = flag.Bool("random", false, "Use a flat set of random options instead of the default interactive options")
+	flatSetRandomOptions = flag.Bool("random", false, "Use a set of random options for the strory instead of user interactive input")
 )
 
 var Commit = func() string {
@@ -96,12 +75,12 @@ func main() {
 	fmt.Println()
 	fmt.Println("This program uses OpenAI's GPT-3 API to generate a fairy tale in German with the help of AWS Polly.")
 	fmt.Println()
-	pterm.Info.Printf("Loaded %v main charaters, %v support charaters, %v locations, %v plots which results in %v possible stories\n", len(CharacterMainSet), len(CharacterSupporterSet), len(LocationSet), len(StoryPlotSet), len(CharacterMainSet)*len(CharacterSupporterSet)*len(LocationSet)*len(StoryPlotSet))
+	pterm.Info.Printf("Loaded %v main charaters, %v support charaters, %v locations, %v plots which results in %v possible stories\n", len(story.CharacterMainSet), len(story.CharacterSupporterSet), len(story.LocationSet), len(story.StoryPlotSet), len(story.CharacterMainSet)*len(story.CharacterSupporterSet)*len(story.LocationSet)*len(story.StoryPlotSet))
 	fmt.Println()
 
 	flag.Parse()
 
-	if apiKey == "" || awsAccessKey == "" || awsSecretKey == "" || orgID == "" {
+	if apiKey == "" || awsKeyId == "" || awsSecretAccessKey == "" || orgID == "" {
 		pterm.Error.Println("Please set the environment variables OPENAI_API_KEY, OPENAI_ORGANIZATION, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY.")
 		return
 	}
@@ -113,16 +92,19 @@ func main() {
 		return
 	}
 
-	fairyTaleOptions := getFairyTaleOptions(*flatSetRandomOptions)
+	fairyTaleOptions := story.GetFairyTaleOptions(*flatSetRandomOptions, ChapterCount)
 
-	generateAndPlay(fairyTaleOptions, targetFolder)
+	openai := openai.New(apiKey, orgID, model, fairyTaleOptions)
+	amazonpolly := amazonpolly.New(awsKeyId, awsSecretAccessKey)
+
+	generateAndPlay(targetFolder, openai, amazonpolly)
 }
 
 // generateAndPlay generates the fairy tale text and audio and plays the audio.
-func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
+func generateAndPlay(targetFolder string, openai *openai.OpenAI, amazonpolly *amazonpolly.AmazonPolly) {
 	pterm.Info.Println("Generating fairy tale")
 
-	fairyTaleChaptors, prompt, err := generateFairyTaleText(apiKey, orgID, opts)
+	fairyTaleChaptors, prompt, err := openai.GenerateFairyTaleText()
 	if err != nil {
 		pterm.Error.Printf("Error generating fairy tale: %v\n", err)
 		return
@@ -142,7 +124,7 @@ func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
 	pterm.Info.Println("Generating audio from fairy tale")
 
 	outputFilename := filepath.Join(targetFolder, fmt.Sprintf("%s_fairy_tale.mp3", ts))
-	generateAudioFromChaptors(fairyTaleChaptors, outputFilename)
+	amazonpolly.GenerateAudioFromChaptors(fairyTaleChaptors, outputFilename)
 
 	pterm.Info.Printf("German audio saved to: %s\n", outputFilename)
 
@@ -155,21 +137,6 @@ func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
 			return
 		}
 	}
-}
-
-func textToLinesInRandomOrder(text string) []string {
-	lines := []string{}
-	for _, line := range strings.Split(text, "\n") {
-		if line != "" {
-			lines = append(lines, strings.Trim(line, ""))
-		}
-	}
-
-	rand.Shuffle(len(lines), func(i, j int) {
-		lines[i], lines[j] = lines[j], lines[i]
-	})
-
-	return lines
 }
 
 func createTimestamp() string {
