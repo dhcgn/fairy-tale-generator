@@ -47,13 +47,13 @@ var (
 // Options for the fairy tale
 var (
 	// CharacterSupporterSet is the set of supporter characters for the fairy tale.
-	CharacterSupporterSet = textToLines(characterSupporterSetAsset)
+	CharacterSupporterSet = textToLinesInRandomOrder(characterSupporterSetAsset)
 	// LocationSet is the set of locations for the fairy tale.
-	LocationSet = textToLines(locationSetAsset)
+	LocationSet = textToLinesInRandomOrder(locationSetAsset)
 	// StoryPlotSet is the set of story plots for the fairy tale.
-	StoryPlotSet = textToLines(storyPlotsSetAsset)
+	StoryPlotSet = textToLinesInRandomOrder(storyPlotsSetAsset)
 	// CharacterMainSet is the set of main characters for the fairy tale.
-	CharacterMainSet = textToLines(characterMainSetAsset)
+	CharacterMainSet = textToLinesInRandomOrder(characterMainSetAsset)
 )
 
 var (
@@ -148,7 +148,7 @@ func generateAndPlay(opts fairyTaleOptions, targetFolder string) {
 	}
 }
 
-func textToLines(text string) []string {
+func textToLinesInRandomOrder(text string) []string {
 	lines := []string{}
 	for _, line := range strings.Split(text, "\n") {
 		if line != "" {
