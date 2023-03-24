@@ -32,11 +32,14 @@ func getFairyTaleOptions(randomWithNoUserInput bool) fairyTaleOptions {
 		}
 	}
 
-	selectedMainCharaters, _ := pterm.DefaultInteractiveMultiselect.WithOptions(CharacterMainSet).WithDefaultOptions(CharacterMainSet).WithDefaultText("Select the main characters").Show()
+	selectedMainCharaters, _ := pterm.DefaultInteractiveMultiselect.WithOptions(CharacterMainSet).WithDefaultText("Select the main characters").Show()
 
 	if len(selectedMainCharaters) == 0 {
 		pterm.Warning.Println("No main characters selected, a random character will be selected.")
 		selectedMainCharaters = append(selectedMainCharaters, CharacterMainSet[rand.Intn(len(CharacterMainSet))])
+		if slices.IndexFunc(selectedMainCharaters, func(c string) bool { return strings.EqualFold(c, "Amy") }) == -1 {
+			CharacterSupporterSet = append(CharacterSupporterSet, "Amy the princess")
+		}
 	}
 
 	pterm.Info.Printfln("Selected main characters: %s", pterm.Green(selectedMainCharaters))
