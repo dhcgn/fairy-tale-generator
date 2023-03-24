@@ -103,7 +103,7 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 
 	chapters := []string{}
 
-	pterm.Info.Println("Generating 1. chapter with the OpenAI model", model, "...")
+	pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", 1, model)
 
 	response, err := generateFairyTaleTextInternal(apiKey, data)
 
@@ -119,7 +119,7 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 	conservation = append(conservation, Message{assistant, "Write next chapter."})
 
 	for i := 0; i < ChapterCount-1; i++ {
-		pterm.Info.Printf("Generating %v. chapter ...\n", i+2)
+		pterm.Info.Printf("Generating %v. chapter with the OpenAI model %v ...\n", i+2, model)
 
 		response, err = generateFairyTaleTextInternal(apiKey, request{
 			Model:    model,
