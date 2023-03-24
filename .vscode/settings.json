@@ -3,4 +3,5 @@
         "-tags=integration"
     ],
     "go.testTags": "integration",
+    "go.coverOnSave": false,
 }

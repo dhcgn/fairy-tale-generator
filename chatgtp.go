@@ -30,14 +30,15 @@ func generateChatGtpPrompt(mainCharaters []string, supporterCharaters []string, 
 
 	prompt := fmt.Sprintf(`Create a children fairy tale in German with the following setup.
 	
-main characters: %s
-support characters: %s
+Main characters: %s
+Support characters: %s
 
-the story takes place in %s
-the plot of the main characters is %s
+The story takes place in %s
+The plot of the main characters is: %s
 
-The fairy tale should be funny and entertaining for children, write it in in 3 chapters. Start only with the first chapter.
-`, mainCharatersAggregated, supporterCharatersAggregated, location, storyPlot)
+The fairy tale should be funny, entertaining for children and in german.
+Write it in %v chapters and start only with the first chapter.
+`, mainCharatersAggregated, supporterCharatersAggregated, location, storyPlot, ChapterCount)
 
 	return prompt
 }
@@ -98,7 +99,6 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 	data := request{
 		Model:    "gpt-3.5-turbo",
 		Messages: conservation,
-		//MaxTokens: 4_096 - getCharsInConversation(conservation)/3,
 	}
 	// max tokens: https://platform.openai.com/docs/models/gpt-4
 
@@ -119,13 +119,12 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 	conservation = append(conservation, response.Choices[0].Message)
 	conservation = append(conservation, Message{assistant, "Write next chapter."})
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < ChapterCount-1; i++ {
 		pterm.Info.Printf("Generating %v. chapter ...\n", i+2)
 
 		response, err = generateFairyTaleTextInternal(apiKey, request{
 			Model:    "gpt-3.5-turbo",
 			Messages: conservation,
-			// MaxTokens: 4_096 - getCharsInConversation(conservation)/4 - 100,
 		})
 		if err != nil {
 			return nil, "", err

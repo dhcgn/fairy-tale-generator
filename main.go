@@ -25,6 +25,11 @@ var (
 	Version = "dev"
 )
 
+const (
+	// ChapterCount is the number of chaptors in the fairy tale.
+	ChapterCount = 3
+)
+
 var (
 	apiKey       = os.Getenv("OPENAI_API_KEY")
 	orgID        = os.Getenv("OPENAI_ORGANIZATION")
