@@ -28,6 +28,10 @@ var (
 const (
 	// ChapterCount is the number of chaptors in the fairy tale.
 	ChapterCount = 3
+	// OpenAI API model
+	// Most capable GPT-3.5 model and optimized for chat at 1/10th the cost of text-davinci-003. Will be updated with our latest model iteration.
+	// Max tokens: 4,096 tokens
+	model = "gpt-3.5-turbo"
 )
 
 var (

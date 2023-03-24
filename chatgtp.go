@@ -28,7 +28,7 @@ func generateChatGtpPrompt(mainCharaters []string, supporterCharaters []string, 
 	mainCharatersAggregated := aggregateSlice(mainCharaters)
 	supporterCharatersAggregated := aggregateSlice(supporterCharaters)
 
-	prompt := fmt.Sprintf(`Create a children fairy tale in German with the following setup.
+	prompt := fmt.Sprintf(`Write a children fairy tale in German with around 1200 words and the following setup.
 	
 Main characters: %s
 Support characters: %s
@@ -97,14 +97,13 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 		{assistant, prompt},
 	}
 	data := request{
-		Model:    "gpt-3.5-turbo",
+		Model:    model,
 		Messages: conservation,
 	}
-	// max tokens: https://platform.openai.com/docs/models/gpt-4
 
 	chapters := []string{}
 
-	pterm.Info.Println("Generating 1. chapter ...")
+	pterm.Info.Println("Generating 1. chapter with the OpenAI model", model, "...")
 
 	response, err := generateFairyTaleTextInternal(apiKey, data)
 
@@ -123,7 +122,7 @@ func generateFairyTaleText(apiKey string, orgID string, opts fairyTaleOptions) (
 		pterm.Info.Printf("Generating %v. chapter ...\n", i+2)
 
 		response, err = generateFairyTaleTextInternal(apiKey, request{
-			Model:    "gpt-3.5-turbo",
+			Model:    model,
 			Messages: conservation,
 		})
 		if err != nil {
